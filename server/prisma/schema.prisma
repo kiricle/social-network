@@ -20,16 +20,26 @@ model User {
   updatedAt DateTime @updatedAt
   role      Role     @default(USER)
   posts     Post[]
+  likes     Like[]
 }
 
 model Post {
-  id        String   @id @default(uuid())
+  id        Int   @id @default(autoincrement())
   title     String
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  Int
+  likes     Like[]
+}
+
+model Like {
+  id Int @id @default(autoincrement())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
 }
 
 enum Role {
