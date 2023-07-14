@@ -21,10 +21,20 @@ model User {
   role      Role     @default(USER)
   posts     Post[]
   likes     Like[]
+  token     Token?
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  expiresAt DateTime @default(now())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
 }
 
 model Post {
-  id        Int   @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   title     String
   content   String
   createdAt DateTime @default(now())
@@ -35,10 +45,10 @@ model Post {
 }
 
 model Like {
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId Int
 }
 

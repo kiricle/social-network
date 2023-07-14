@@ -1,4 +1,5 @@
-import UserDto from '@/dto/userDto';
+import UserDTO from '@/dto/UserDTO';
+import { tokenService } from '@/services/TokenService';
 import prisma from '@/utils/db.server';
 import bcrypt from 'bcrypt';
 
@@ -25,15 +26,38 @@ class UserService {
             },
         });
 
-        const userDto = new UserDto(
-            user.id,
-            user.email,
-            user.firstName,
-            user.lastName,
-            user.role
-        );
+        const userDto = new UserDTO(user);
 
         return userDto;
+    }
+
+    async login(email, password) {
+        const user = await prisma.user.findFirst({
+            where: {
+                email,
+            },
+        });
+
+        if (!user) {
+            throw new Error('User does not exist');
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            throw new Error('Invalid password');
+        }
+
+        const tokens = tokenService.generateToken({
+            id: user.id,
+        });
+
+        await tokenService.saveToken(user.id, tokens.refreshToken);
+
+        return {
+            user: new UserDTO(user),
+            tokens
+        };
     }
 }
 
