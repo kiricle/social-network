@@ -1,4 +1,4 @@
-import { convertStringToDate } from '@/utils/convertStringToDate';
+import { addStringDateToNow } from '@/utils/addStringDateToNow';
 import prisma from '@/utils/db.server';
 import env from 'dotenv';
 import jwt from 'jsonwebtoken';
@@ -39,7 +39,7 @@ class TokenService {
             },
         });
 
-        const expiresAt = convertStringToDate(this.refreshTokenExpiresIn)
+        const expiresAt = addStringDateToNow(this.refreshTokenExpiresIn)
 
         if (tokenData !== null) {
             return await prisma.token.update({
@@ -57,6 +57,14 @@ class TokenService {
             data: {
                 userId,
                 expiresAt: expiresAt,
+                token: refreshToken,
+            },
+        });
+    }
+
+    async removeToken(refreshToken: string) {
+        return await prisma.token.delete({
+            where: {
                 token: refreshToken,
             },
         });

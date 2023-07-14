@@ -43,6 +43,17 @@ class userController {
             console.log(error);
         }
     }
+
+    async logout(req: Request, res: Response) {
+        try {
+            const { refreshToken } = req.cookies;
+            await userService.logout(refreshToken);
+            res.clearCookie('refreshToken');
+            res.status(200).json({ message: 'User logged out' });
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
 
 export default new userController();

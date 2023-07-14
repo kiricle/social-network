@@ -1,4 +1,4 @@
-export function convertStringToDate(dateString: string): Date {
+export function addStringDateToNow(dateString: string): Date {
     const time = dateString.replace(/[^\d]/g, '');
     const unit = dateString.replace(/[^a-zA-Z]/g, '');
     const now = new Date();
