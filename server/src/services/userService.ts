@@ -1,3 +1,4 @@
+import { APIError } from './../exceptions/APIError';
 import UserDTO from '@/dto/UserDTO';
 import { tokenService } from '@/services/TokenService';
 import prisma from '@/utils/db.server';
@@ -12,7 +13,7 @@ class UserService {
         });
 
         if (doesUserExist) {
-            throw new Error('User already exists');
+            throw APIError.badRequest('User already exists', []);
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,13 +40,13 @@ class UserService {
         });
 
         if (!user) {
-            throw new Error('User does not exist');
+            throw APIError.badRequest('User not found', []);
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            throw new Error('Invalid password');
+            throw APIError.badRequest('Invalid password', []);
         }
 
         const tokens = tokenService.generateToken({
@@ -56,7 +57,7 @@ class UserService {
 
         return {
             user: new UserDTO(user),
-            tokens
+            tokens,
         };
     }
 
