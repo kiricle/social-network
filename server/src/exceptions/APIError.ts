@@ -16,4 +16,8 @@ export class APIError extends Error {
     static unAuthorized(errors) {
         return new APIError('Unauthorized', 401, errors);
     }
+
+    static validationError(message: string) {
+        return new APIError(message, 422, []);
+    }
 }

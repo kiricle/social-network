@@ -1,5 +1,9 @@
 import { body } from 'express-validator';
 
+interface Method {
+    method: 'registerUser' | 'loginUser';
+}
+
 export function validate(method) {
     switch (method) {
         case 'registerUser':

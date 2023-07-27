@@ -1,9 +1,10 @@
 import { APIError } from '@/exceptions/APIError';
-import userService from '@/services/UserService';
+import userService from '@/services/AuthService';
+import { tokenLifetimeStringToNumber } from '@/utils/tokenLifetimeStringToNumber';
 import { NextFunction, Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 
-class userController {
+class AuthController {
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req);
@@ -59,6 +60,23 @@ class userController {
             next(error);
         }
     }
+
+    async refresh(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { refreshToken } = req.cookies;
+            const userData = await userService.refresh(refreshToken);
+
+            res.cookie('refreshToken', userData.refreshToken, {
+                maxAge: tokenLifetimeStringToNumber(
+                    process.env.JWT_REFRESH_TOKEN_EXPIRES_IN
+                ),
+            });
+
+            return res.status(200).json(userData);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
-export default new userController();
+export default new AuthController();

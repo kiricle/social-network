@@ -1,3 +1,5 @@
+import { APIError } from '@/exceptions/APIError';
+import { UserJwtPayload } from '@/interfaces/userJWTPayload';
 import { addStringDateToNow } from '@/utils/addStringDateToNow';
 import prisma from '@/utils/db.server';
 import env from 'dotenv';
@@ -39,7 +41,7 @@ class TokenService {
             },
         });
 
-        const expiresAt = addStringDateToNow(this.refreshTokenExpiresIn)
+        const expiresAt = addStringDateToNow(this.refreshTokenExpiresIn);
 
         if (tokenData !== null) {
             return await prisma.token.update({
@@ -68,6 +70,39 @@ class TokenService {
                 token: refreshToken,
             },
         });
+    }
+
+    validateAccessToken(token: string) {
+        try {
+            const userData = jwt.verify(token, this.accessSecret);
+
+            return userData;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    validateRefreshToken(token: string) {
+        try {
+            const userData = jwt.verify(
+                token,
+                this.refreshSecret
+            ) as UserJwtPayload;
+
+            return userData;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async findToken(refreshToken: string) {
+        const tokenFromDB = await prisma.token.findFirst({
+            where: {
+                token: refreshToken,
+            },
+        });
+
+        return tokenFromDB;
     }
 }
 

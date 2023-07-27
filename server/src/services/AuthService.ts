@@ -1,10 +1,10 @@
-import { APIError } from './../exceptions/APIError';
+import { APIError } from '../exceptions/APIError';
 import UserDTO from '@/dto/UserDTO';
 import { tokenService } from '@/services/TokenService';
 import prisma from '@/utils/db.server';
 import bcrypt from 'bcrypt';
 
-class UserService {
+class AuthService {
     async register(email, password, firstName, lastName) {
         const doesUserExist = await prisma.user.findFirst({
             where: {
@@ -66,6 +66,41 @@ class UserService {
 
         return token;
     }
+
+    async refresh(refreshToken) {
+        if(!refreshToken) {
+            throw APIError.badRequest('Token not provided', []);
+        }
+
+        const userData = tokenService.validateRefreshToken(refreshToken);
+        const tokenFromDb = await tokenService.findToken(refreshToken);
+    
+        if (!userData || !tokenFromDb) {
+            throw APIError.unAuthorized([]);
+        }
+
+        const user = await prisma.user.findFirst({
+            where: {
+                id: userData.id,
+            },
+        });
+
+        const userDTO = new UserDTO(user);
+        const tokens = tokenService.generateToken({
+            id: user.id,
+        });
+
+        await tokenService.saveToken(user.id, tokens.refreshToken);
+
+        return {
+            user: userDTO,
+            ...tokens,
+        };
+    }
+
+    async getProfileData(userId) {
+        
+    }
 }
 
-export default new UserService();
+export default new AuthService();

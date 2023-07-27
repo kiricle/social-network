@@ -1,6 +1,6 @@
-export function addStringDateToNow(dateString: string): Date {
-    const time = dateString.replace(/[^\d]/g, '');
-    const unit = dateString.replace(/[^a-zA-Z]/g, '');
+export function addStringDateToNow(lifetimeString: string): Date {
+    const time = lifetimeString.replace(/[^\d]/g, '');
+    const unit = lifetimeString.replace(/[^a-zA-Z]/g, '');
     const now = new Date();
 
     const returnObject = {
