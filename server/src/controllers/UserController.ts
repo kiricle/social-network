@@ -1,24 +1,28 @@
 import UserDTO from '@/dto/UserDTO';
-import { tokenService } from '@/services/TokenService';
 import UserService from '@/services/UserService';
 import { NextFunction, Request, Response } from 'express';
 
-class userController {
-    async getUserById(req: Request, res: Response, next: NextFunction) {
+interface IUserRequest extends Request {
+    user: {
+        id: number;
+        iat: number;
+        exp: number;
+    };
+}
+
+class UserController {
+    async getUserById(req: IUserRequest, res: Response, next: NextFunction) {
         try {
-            const { refreshToken } = req.cookies;
             const { id } = req.params;
+            const requestingUser = req.user;
 
-            const user = await UserService.getUserById(id);
-            const responser = await tokenService.validateRefreshToken(
-                refreshToken
-            );
+            const requestedUser = await UserService.getUserById(id);
 
-            const userDto = new UserDTO(user);
+            const userDto = new UserDTO(requestedUser);
 
             res.status(200).json({
                 userDto,
-                isCurrentUser: responser.id === user.id,
+                isCurrentUser: requestingUser.id === requestedUser.id,
             });
         } catch (error) {
             next(error);
@@ -26,4 +30,4 @@ class userController {
     }
 }
 
-export default new userController();
+export default new UserController();
