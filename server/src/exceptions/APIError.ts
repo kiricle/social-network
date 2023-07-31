@@ -21,6 +21,10 @@ export class APIError extends Error {
         return new APIError(message, 404, []);
     }
 
+    static forbidden(message: string) {
+        return new APIError(message, 403, [])
+    }
+
     static validationError(message: string) {
         return new APIError(message, 422, []);
     }
