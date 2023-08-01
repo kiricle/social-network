@@ -1,8 +1,12 @@
-import { APIError } from "@/exceptions/APIError";
-import { tokenService } from "@/services/TokenService";
+import { NextFunction, Request, Response } from 'express';
+import { APIError } from '@/exceptions/APIError';
+import { tokenService } from '@/services/TokenService';
 
-
-export function authMiddleware(req,res,next) {
+export function authMiddleware(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     try {
         const authHeader = req.headers.authorization;
 
@@ -22,10 +26,9 @@ export function authMiddleware(req,res,next) {
             return next(APIError.unAuthorized([]));
         }
 
-        req.user = userData;
+        req['user'] = userData;
 
         next();
-
     } catch (error) {
         next(APIError.unAuthorized([]));
     }

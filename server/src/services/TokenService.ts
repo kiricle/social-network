@@ -1,5 +1,5 @@
 import { APIError } from '@/exceptions/APIError';
-import { UserJwtPayload } from '@/interfaces/userJWTPayload';
+import { UserJwtPayload } from '@/interfaces/UserJwtPayload';
 import { addStringDateToNow } from '@/utils/addStringDateToNow';
 import prisma from '@/utils/db.server';
 import env from 'dotenv';

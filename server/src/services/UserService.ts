@@ -27,7 +27,7 @@ class UserService {
         });
 
         await this.deleteProfilePicture(profile_picture);
-        
+
         const user = await prisma.user.update({
             where: {
                 id,

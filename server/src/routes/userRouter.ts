@@ -14,4 +14,6 @@ userRouter.patch(
     userController.updateProfilePicture
 );
 
+
+
 export default userRouter;

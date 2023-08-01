@@ -2,14 +2,9 @@ import { userService } from '@/services/UserService';
 import UserDTO from '@/dto/UserDTO';
 import { APIError } from '@/exceptions/APIError';
 import { NextFunction, Request, Response } from 'express';
+import { IUserRequest } from '@/interfaces/IUserRequest';
 
-interface IUserRequest extends Request {
-    user: {
-        id: number;
-        iat: number;
-        exp: number;
-    };
-}
+
 
 class UserController {
     async getUserById(req: IUserRequest, res: Response, next: NextFunction) {
@@ -38,7 +33,7 @@ class UserController {
         try {
             const { file } = req;
 
-            if(!file) {
+            if (!file) {
                 next(APIError.badRequest('File has not been uploaded', []));
             }
 
@@ -46,12 +41,17 @@ class UserController {
             const requestingUser = req.user;
 
             if (Number.parseInt(id) !== requestingUser.id) {
-                return next(APIError.forbidden(
-                    "You don't have rights to edit this profile"
-                ));
+                return next(
+                    APIError.forbidden(
+                        "You don't have rights to edit this profile"
+                    )
+                );
             }
 
-            const result = await userService.updateProfilePicture(Number.parseInt(id), file);
+            const result = await userService.updateProfilePicture(
+                Number.parseInt(id),
+                file
+            );
 
             res.status(200).json(result);
         } catch (error) {
